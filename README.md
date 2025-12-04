@@ -1,4 +1,4 @@
-# Essential
+# Essential [Open Source]
 
 **Essential** is a powerful macOS clipboard manager that runs seamlessly from your menu bar. Keep track of everything you copy, take screenshots directly to your clipboard, and access your clipboard history instantly with global hotkeys.
 
