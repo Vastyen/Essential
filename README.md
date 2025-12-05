@@ -23,7 +23,9 @@
 
 ### Preview
 
-![Preview](https://github.com/Vastyen/Essential/blob/main/Preview.png)
+<p align="center">
+  <img src="https://github.com/Vastyen/Essential/blob/main/Preview.png" width="800" />
+</p>
 
 ### 🎨 Customization
 
