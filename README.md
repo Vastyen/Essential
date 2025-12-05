@@ -23,7 +23,7 @@
 
 ### Preview
 
-![Preview](https://i.ibb.co/R4GVHdkc/Group-1.png)
+<img src="https://i.ibb.co/R4GVHdkc/Group-1.png" width="650"/>
 
 ### 🎨 Customization
 
