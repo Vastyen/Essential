@@ -23,9 +23,9 @@
 
 ### Preview
 
-<p align="center">
-  <img src="https://i.ibb.co/R4GVHdkc/Group-1.png" style="max-width: 100%; height: auto;">
-</p>
+<div style="display: flex; justify-content: center; width: 100%;">
+  <img src="https://i.ibb.co/R4GVHdkc/Group-1.png" style="max-width: 100%; height: auto;"/>
+</div>
 
 ### 🎨 Customization
 
