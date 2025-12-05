@@ -23,7 +23,7 @@
 
 ### Preview
 
-<img width="2932" height="2327" alt="Group 1" src="https://github.com/user-attachments/assets/16d4b4e0-8f20-4f86-95e1-2ef1c94ba939" />
+<img width="2932" height="2327" alt="Preview" src="https://github.com/user-attachments/assets/869f10a0-753a-429d-9380-b1f55f94b863" />
 
 ### 🎨 Customization
 
