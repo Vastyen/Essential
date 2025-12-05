@@ -23,9 +23,12 @@
 
 ### Preview
 
+![Preview](https://github.com/Vastyen/Essential/raw/main/Preview.png)
+
 <p align="center">
-  <img src="https://github.com/Vastyen/Essential/blob/main/Preview.png?raw=true" width="800" />
+  <img src="https://github.com/Vastyen/Essential/raw/main/Preview.png" width="800" />
 </p>
+
 
 ### 🎨 Customization
 
