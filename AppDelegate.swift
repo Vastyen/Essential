@@ -215,32 +215,153 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func captureScreenSelection() {
         DispatchQueue.global(qos: .userInitiated).async {
-            let process = Process()
-            process.executableURL = URL(fileURLWithPath: "/usr/sbin/screencapture")
-            process.arguments = ["-c", "-s"]
-            
-            do {
-                try process.run()
-                process.waitUntilExit()
-            } catch {
-                print("Error running screencapture: \(error)")
+            // Verificar y solicitar permisos si es necesario
+            self.ensureScreenCapturePermission { [weak self] hasPermission in
+                guard let self = self else { return }
+                
+                if !hasPermission {
+                    print("⚠️ Screen Recording permission required to take screenshots")
+                    return
+                }
+                
+                let screenshotPath = self.getScreenshotPath()
+                
+                // Guardar la captura en el archivo
+                let process = Process()
+                process.executableURL = URL(fileURLWithPath: "/usr/sbin/screencapture")
+                process.arguments = ["-s", screenshotPath]
+                
+                do {
+                    try process.run()
+                    process.waitUntilExit()
+                    
+                    // Verificar que el archivo se creó y copiarlo al portapapeles
+                    if FileManager.default.fileExists(atPath: screenshotPath),
+                       let image = NSImage(contentsOfFile: screenshotPath) {
+                        // Copiar al portapapeles
+                        let pasteboard = NSPasteboard.general
+                        pasteboard.clearContents()
+                        pasteboard.writeObjects([image])
+                        
+                        print("✅ Screenshot guardada en: \(screenshotPath)")
+                    } else {
+                        print("⚠️ Screenshot file not created - permission may be required")
+                    }
+                } catch {
+                    print("Error running screencapture: \(error)")
+                }
             }
         }
     }
 
     private func captureFullScreen() {
         DispatchQueue.global(qos: .userInitiated).async {
-            let process = Process()
-            process.executableURL = URL(fileURLWithPath: "/usr/sbin/screencapture")
-            process.arguments = ["-c"]
-            
-            do {
-                try process.run()
-                process.waitUntilExit()
-            } catch {
-                print("Error running screencapture: \(error)")
+            // Verificar y solicitar permisos si es necesario
+            self.ensureScreenCapturePermission { [weak self] hasPermission in
+                guard let self = self else { return }
+                
+                if !hasPermission {
+                    print("⚠️ Screen Recording permission required to take screenshots")
+                    return
+                }
+                
+                let screenshotPath = self.getScreenshotPath()
+                
+                // Guardar la captura en el archivo
+                let process = Process()
+                process.executableURL = URL(fileURLWithPath: "/usr/sbin/screencapture")
+                process.arguments = [screenshotPath]
+                
+                do {
+                    try process.run()
+                    process.waitUntilExit()
+                    
+                    // Verificar que el archivo se creó y copiarlo al portapapeles
+                    if FileManager.default.fileExists(atPath: screenshotPath),
+                       let image = NSImage(contentsOfFile: screenshotPath) {
+                        // Copiar al portapapeles
+                        let pasteboard = NSPasteboard.general
+                        pasteboard.clearContents()
+                        pasteboard.writeObjects([image])
+                        
+                        print("✅ Screenshot guardada en: \(screenshotPath)")
+                    } else {
+                        print("⚠️ Screenshot file not created - permission may be required")
+                    }
+                } catch {
+                    print("Error running screencapture: \(error)")
+                }
             }
         }
+    }
+    
+    private func ensureScreenCapturePermission(completion: @escaping (Bool) -> Void) {
+        // Verificar permisos primero
+        var hasPermission = CGPreflightScreenCaptureAccess()
+        
+        if hasPermission {
+            completion(true)
+            return
+        }
+        
+        // Si no hay permisos, intentar solicitarlos
+        print("📹 Screen Recording permission not granted, requesting...")
+        
+        DispatchQueue.main.async {
+            NSApp.activate(ignoringOtherApps: true)
+            
+            // Solicitar permisos
+            let granted = CGRequestScreenCaptureAccess()
+            
+            if granted {
+                print("✅ Screen Recording permission granted")
+                completion(true)
+                return
+            }
+            
+            // Esperar un momento y verificar de nuevo (a veces hay delay en la actualización)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                hasPermission = CGPreflightScreenCaptureAccess()
+                
+                if hasPermission {
+                    print("✅ Screen Recording permission granted (after delay)")
+                    completion(true)
+                } else {
+                    print("⚠️ Screen Recording permission still not granted")
+                    // Abrir System Settings para que el usuario pueda otorgar permisos
+                    if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture") {
+                        NSWorkspace.shared.open(url)
+                        NSApp.activate(ignoringOtherApps: true)
+                    }
+                    completion(false)
+                }
+            }
+        }
+    }
+    
+    private func getScreenshotPath() -> String {
+        // Obtener la ruta guardada en UserDefaults, o usar la ruta por defecto
+        UserDefaults.standard.synchronize()
+        let savedPath = UserDefaults.standard.string(forKey: "screenshotPath")
+        
+        let screenshotsURL: URL
+        if let savedPath = savedPath, !savedPath.isEmpty {
+            screenshotsURL = URL(fileURLWithPath: savedPath)
+        } else {
+            // Ruta por defecto: ~/Documents/Screenshots
+            let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+            screenshotsURL = documentsURL.appendingPathComponent("Screenshots")
+        }
+        
+        // Crear el directorio si no existe
+        try? FileManager.default.createDirectory(at: screenshotsURL, withIntermediateDirectories: true, attributes: nil)
+        
+        // Generar nombre de archivo con timestamp
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH.mm.ss"
+        let fileName = "Screenshot \(formatter.string(from: Date())).png"
+        
+        return screenshotsURL.appendingPathComponent(fileName).path
     }
 }
 

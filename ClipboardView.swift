@@ -10,11 +10,12 @@ struct OnboardingView: View {
     @State private var permissionTimer: Timer?
     @State private var animateHeader = false
     @State private var currentStep: Int = 1
+    @State private var screenshotPath: String = ""
     
     let onComplete: () -> Void
     
     private let iconOptions = ["</>", "⌘", "⌥"]
-    private let totalSteps = 3
+    private let totalSteps = 4
     
     var body: some View {
         VStack(spacing: 0) {
@@ -59,6 +60,7 @@ struct OnboardingView: View {
         .onAppear {
             checkPermissions()
             loadSavedIcon()
+            loadScreenshotPath()
             
             withAnimation(.easeOut(duration: 0.6).delay(0.1)) {
                 animateHeader = true
@@ -151,9 +153,11 @@ struct OnboardingView: View {
         case 1:
             step1Permissions
         case 2:
-            step2Icons
+            step2ScreenshotPath
         case 3:
-            step3Shortcuts
+            step3Icons
+        case 4:
+            step4Shortcuts
         default:
             step1Permissions
         }
@@ -372,8 +376,86 @@ struct OnboardingView: View {
         )
     }
     
-    // Step 2: Icon Selection
-    private var step2Icons: some View {
+    // Step 2: Screenshot Path
+    private var step2ScreenshotPath: some View {
+        VStack(spacing: 24) {
+            VStack(spacing: 12) {
+                Image(systemName: "folder.fill")
+                    .font(.system(size: 56))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [.orange, .pink],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .shadow(color: .orange.opacity(0.3), radius: 12, y: 4)
+                
+                Text("Step 2: Screenshot Location")
+                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                
+                Text("Choose where to save your screenshots")
+                    .font(.system(size: 14))
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+            
+            VStack(spacing: 16) {
+                // Mostrar la ruta actual
+                HStack {
+                    Image(systemName: "folder")
+                        .foregroundColor(.secondary)
+                        .font(.system(size: 14))
+                    
+                    Text(screenshotPath.isEmpty ? getDefaultScreenshotPath() : screenshotPath)
+                        .font(.system(size: 13, design: .monospaced))
+                        .foregroundColor(.secondary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                    
+                    Spacer()
+                }
+                .padding(16)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color(nsColor: .controlBackgroundColor))
+                        .shadow(color: .black.opacity(0.05), radius: 6, y: 3)
+                )
+                
+                // Botón para seleccionar carpeta
+                Button {
+                    selectScreenshotFolder()
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "folder.badge.plus")
+                            .font(.system(size: 14))
+                        Text("Choose Folder")
+                            .font(.system(size: 14, weight: .semibold))
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 12)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                
+                // Botón para usar la ruta por defecto
+                Button {
+                    screenshotPath = ""
+                    saveScreenshotPath("")
+                } label: {
+                    Text("Use Default (Documents/Screenshots)")
+                        .font(.system(size: 13))
+                        .foregroundColor(.secondary)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(.horizontal, 32)
+        .padding(.vertical, 20)
+    }
+    
+    // Step 3: Icon Selection
+    private var step3Icons: some View {
         VStack(spacing: 24) {
             VStack(spacing: 12) {
                 Image(systemName: "menubar.rectangle")
@@ -387,7 +469,7 @@ struct OnboardingView: View {
                     )
                     .shadow(color: .purple.opacity(0.3), radius: 12, y: 4)
                 
-                Text("Step 2: Menu Bar Icon")
+                Text("Step 3: Menu Bar Icon")
                     .font(.system(size: 22, weight: .bold, design: .rounded))
                 
                 Text("Choose your preferred icon style for the menu bar")
@@ -465,8 +547,8 @@ struct OnboardingView: View {
         .scaleEffect(selectedIcon == icon ? 1.05 : 1.0)
     }
     
-    // Step 3: Shortcuts
-    private var step3Shortcuts: some View {
+    // Step 4: Shortcuts
+    private var step4Shortcuts: some View {
         VStack(spacing: 24) {
             VStack(spacing: 12) {
                 Image(systemName: "keyboard.fill")
@@ -480,7 +562,7 @@ struct OnboardingView: View {
                     )
                     .shadow(color: .blue.opacity(0.3), radius: 12, y: 4)
                 
-                Text("Step 3: Keyboard Shortcuts")
+                Text("Step 4: Keyboard Shortcuts")
                     .font(.system(size: 22, weight: .bold, design: .rounded))
                 
                 Text("Learn the essential shortcuts to get started")
@@ -493,6 +575,36 @@ struct OnboardingView: View {
         }
         .padding(.horizontal, 32)
         .padding(.vertical, 20)
+    }
+    
+    private func getDefaultScreenshotPath() -> String {
+        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let screenshotsURL = documentsURL.appendingPathComponent("Screenshots")
+        return screenshotsURL.path
+    }
+    
+    private func selectScreenshotFolder() {
+        let panel = NSOpenPanel()
+        panel.title = "Select Screenshot Folder"
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = true
+        panel.canChooseFiles = false
+        panel.canCreateDirectories = true
+        
+        // Si ya hay una ruta guardada, abrir en esa ubicación
+        if !screenshotPath.isEmpty {
+            panel.directoryURL = URL(fileURLWithPath: screenshotPath)
+        } else {
+            // Abrir en Documents por defecto
+            panel.directoryURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+        }
+        
+        if panel.runModal() == .OK {
+            if let url = panel.url {
+                screenshotPath = url.path
+                saveScreenshotPath(url.path)
+            }
+        }
     }
     
     private func shortcutRow(_ keys: String, _ description: String) -> some View {
@@ -711,6 +823,20 @@ struct OnboardingView: View {
     
     private func saveIcon(_ icon: String) {
         UserDefaults.standard.set(icon, forKey: "menuBarIcon")
+        UserDefaults.standard.synchronize()
+    }
+    
+    private func loadScreenshotPath() {
+        UserDefaults.standard.synchronize()
+        if let saved = UserDefaults.standard.string(forKey: "screenshotPath"), !saved.isEmpty {
+            screenshotPath = saved
+        } else {
+            screenshotPath = ""
+        }
+    }
+    
+    private func saveScreenshotPath(_ path: String) {
+        UserDefaults.standard.set(path, forKey: "screenshotPath")
         UserDefaults.standard.synchronize()
     }
 }
