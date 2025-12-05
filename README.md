@@ -23,9 +23,7 @@
 
 ### Preview
 
-<div style="display: flex; justify-content: center; width: 100%;">
-  <img src="https://i.ibb.co/qMqFhQb8/Group-1-1.png" style="max-width: 100%; height: auto;"/>
-</div>
+![Preview](https://i.ibb.co/qMqFhQb8/Group-1-1.png)
 
 ### 🎨 Customization
 
