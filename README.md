@@ -23,9 +23,7 @@
 
 ### Preview
 
-<p align="center">
-  <img src="https://i.ibb.co/qMqFhQb8/Group-1-1.png" width="800" />
-</p>
+![Preview](https://raw.githubusercontent.com/Vastyen/Essential/Preview.png)
 
 ### 🎨 Customization
 
