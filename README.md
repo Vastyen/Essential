@@ -6,7 +6,7 @@
 
 ## Features
 
-### 📋 Clipboard History
+### Clipboard History
 
 * Tracks your clipboard automatically
 * Stores up to **150 items** (text + images)
@@ -14,7 +14,7 @@
 * Instant pop-over search
 * Global shortcut: **`⌘⇧V`**
 
-### 📸 Screenshot Capture
+### Screenshot Capture
 
 * Full screen: **`⌘⇧3`**
 * Selection: **`⌘⇧4`**
@@ -25,13 +25,13 @@
 
 <img width="2932" height="2327" alt="Preview" src="https://github.com/user-attachments/assets/869f10a0-753a-429d-9380-b1f55f94b863" />
 
-### 🎨 Customization
+### Customization
 
 * Choose your menu-bar icon (`</>`, `⌘`, `⌥`)
 * Select your screenshot folder anytime
 * Minimal, distraction-free UI
 
-### 🚀 Always On
+### Always On
 
 * Runs from the menu bar
 * Can launch at login
